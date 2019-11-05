@@ -8,7 +8,7 @@ print("New Simulation!")
 addpath(genpath('/home/wasp/Downloads/DiscreteTFD'));
 
 % Read the audio file
-[audioData, sampleRate] = audioread('test3/enavant.wav');
+[audioData, sampleRate] = audioread('');
 
 % Setting time para
 timeSampling = 1 / sampleRate;
