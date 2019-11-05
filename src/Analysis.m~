@@ -19,12 +19,6 @@ xlabel('time');
 % Apply first simple FFT
 [ampFreq, freq] = FFTR(audioData, timeSampling);
 figs(2) = figure;
-plot(freq, ampFreq);
-xlabel('Freq');
-ylabel('Amplitude');
-
-
-mfccColect = lagis_mfcc (audioData, 0.032 * sampleRate, 0.016 * sampleRate, 2000, sampleRate, [], 10);
-mfccColect(:, 10)
-size(mfccColect)
-
+plot(freq, y);
+xlabel('Freq')
+ylabel('Amplitude')

@@ -8,11 +8,11 @@
 % Arguments :
 % -----------
 %
-% - signal          -> signal à analyser : doit être un vecteur ligne
-% - taille_fenetre  -> taille des fenêtres d'analyse en nombre d'échantillons
-% - taille_pas      -> taille du pas d'avancement en nombre d'échantillons
-% - taille_fft      -> taille des FFT en nombre d'échantillons
-% - fe              -> fréquence d'échantillonnage
+% - signal          -> signal ï¿½ analyser : doit ï¿½tre un vecteur ligne
+% - taille_fenetre  -> taille des fenï¿½tres d'analyse en nombre d'ï¿½chantillons
+% - taille_pas      -> taille du pas d'avancement en nombre d'ï¿½chantillons
+% - taille_fft      -> taille des FFT en nombre d'ï¿½chantillons
+% - fe              -> frï¿½quence d'ï¿½chantillonnage
 % - nomfichier      -> sauve le premier spectre d'amplitude 
 %                      au format postcript dans ce fichier
 % - nmfcc           -> nombre de filtres MFCC
@@ -31,7 +31,7 @@
 %    M'assurer que la normalisation est bien faite.
 %
 % 2) 30/01/2006
-%    Implémenter d'autres fenêtres que la fenêtre de Hamming.
+%    Implï¿½menter d'autres fenï¿½tres que la fenï¿½tre de Hamming.
 %
 % 3) 30/01/2006
 %    Modulariser tout cela !!!
@@ -44,34 +44,34 @@ function [mfcc_collect] = lagis_mfcc (signal,taille_fenetre,taille_pas,taille_ff
 
 
 %%% initialisations
-inspectspec    = 0;  % pour vérifier l'ajustement des normalisations etc 
-                     % => mettre à 1 pour ce faire ; à 0 sinon
-mfcc_collect   = []; % où les coefficients de la MFCC sont collectés
-numero_pond    = 2;  % choix de la fenêtre de pondération
+inspectspec    = 0;  % pour vï¿½rifier l'ajustement des normalisations etc 
+                     % => mettre ï¿½ 1 pour ce faire ; ï¿½ 0 sinon
+mfcc_collect   = []; % oï¿½ les coefficients de la MFCC sont collectï¿½s
+numero_pond    = 2;  % choix de la fenï¿½tre de pondï¿½ration
 taille_signal  = length(signal);
 
 
-%%% construction de la fenêtre de pondération
+%%% construction de la fenï¿½tre de pondï¿½ration
 switch numero_pond
   case 1
-    % fenêtre de pondération rectangulaire ; works better with the rectangular window
+    % fenï¿½tre de pondï¿½ration rectangulaire ; works better with the rectangular window
     fpond    = ones(1,taille_fenetre);
 
   case 2
-    % fenêtre de ponderation de Hamming
+    % fenï¿½tre de ponderation de Hamming
     %fpond    = 0.54 + 0.46*sin(2*pi*[0:taille_fenetre-1]/(taille_fenetre-1)-pi/2);
     fpond = hamming(taille_fenetre)';
 
   case 3
-    % fenêtre de ponderation de Blackman
+    % fenï¿½tre de ponderation de Blackman
     fpond = blackman(taille_fenetre)';
 end;
-fpond    = 2*fpond/sum(fpond); % normalisation de la fenêtre de pondération
+fpond    = 2*fpond/sum(fpond); % normalisation de la fenï¿½tre de pondï¿½ration
 
 
 %%% construction du banc de filtres MEL
 frequences = [0:taille_fft/2]*fe/taille_fft;
-nombre_filtres    = nmfcc; % ca depend de fe
+nombre_filtres = nmfcc; % ca depend de fe
 frequence_minimum = 130;   % en Hz ; ca depend de fe et de ce qu'on veut
 if (fe==16000)
   frequence_maximum = 6800;  % en Hz ; ca depend de fe
@@ -80,6 +80,8 @@ elseif (fe==8000)
 end;
 Fmin = 2595*log10(frequence_minimum/700 + 1); % \'echelle des Mels
 Fmax = 2595*log10(frequence_maximum/700 + 1); % \'echelle des Mels
+size(Fmax)
+size(nombre_filtres)
 ww   = (Fmax - Fmin)/(nombre_filtres/2+0.5);  % largeur de bande dans l'echelle des Mels
 filtres_mel = zeros(nombre_filtres,length(frequences)); % initialisation filtres Mel
 for ii=1:nombre_filtres
@@ -113,13 +115,14 @@ hold off;
 
 %%% Boucle temporelle
 for ii=1:taille_pas:taille_signal-taille_fenetre
-  % fenêtrage
+  % fenï¿½trage
   signal_fenetre = signal(ii:ii+taille_fenetre-1).*fpond;
 
   % spectre d'amplitude
   spectre = abs(fft(signal_fenetre,taille_fft));
 
-  % log spectre d'amplitude (plot pas nécessaire à l'analyse => simplement pour tester)
+
+  % log spectre d'amplitude (plot pas nï¿½cessaire ï¿½ l'analyse => simplement pour tester)
   if (inspectspec==1 | ii==1)
     spec = 20.*log10(spectre);
     figure(2);
@@ -133,13 +136,15 @@ for ii=1:taille_pas:taille_signal-taille_fenetre
     %print('-dpsc2',nomfichier);
   end;
 
-  for jj=1:nombre_filtres % essayer de me débarrasser de cette boucle
-    % spectre réduit - filtrage Mel
+  for jj=1:nombre_filtres % essayer de me dï¿½barrasser de cette boucle
+    % spectre rï¿½duit - filtrage Mel
     spectre_reduit = spectre(1:length(frequences)).*filtres_mel(jj,:);
 
     % energies spectres reduits
     energies(jj) = log10(sum(spectre_reduit.*spectre_reduit));
   end;
+  
+  size(energies)
 
   % transformation cosinus inverse
   mfcc = dct(energies);
